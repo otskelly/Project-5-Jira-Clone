@@ -70,73 +70,76 @@ describe('Issue create', () => {
     //Add more tests for covering issue creaton functionality
 
     // Test case 1 Custom issue creation "Bug"
-  it.only('Add test case with title Bug', () => {
-    cy.visit('/');
-
-    cy.get('[data-testid="icon:plus"]').click();
-    cy.get('[data-testid="select:type"]').click();
-    cy.get('[data-testid="select-option:Bug"]').trigger('click');
-    cy.get('.ql-editor').type('My bug description');
-    cy.get('input[name="title"]').type('Bug');
-    cy.get('[data-testid="select:reporterId"]').click();
-    cy.get('[data-testid="select-option:Pickle Rick"]').click();
-    cy.get('[data-testid="select:priority"]').click();
-    cy.get('[data-testid="select-option:Highest"]').trigger('click');
-    cy.get('button[type="submit"]').click();
-    
-  
-
-    cy.get('[data-testid="icon:plus"]').should('not.exist');
-    cy.contains('Issue has been successfully created.').should('be.visible');
-
-    cy.reload();
+    describe('Test case 1', () => {
+      beforeEach(() => {
+        cy.visit('/');
+        cy.url().should('eq', `${Cypress.env('baseUrl')}project/board`).then((url) => {
+        
+        cy.visit(url + '/board?modal-issue-create=true');
+        });
+      });
+      it('Should create an issue Bug', () => {
+        cy.get('[data-testid="modal:issue-create"]').within(() => {
+        cy.get('[data-testid="select:type"]').click();
+        cy.get('[data-testid="select-option:Bug"]')
+              .trigger('click');
+        cy.get('.ql-editor').type('My bug description');
+        cy.get('input[name="title"]').type('BUG');
+        cy.get('[data-testid="select:reporterId"]').click();
+        cy.get('[data-testid="select-option:Pickle Rick"]').click();
+        cy.get('button[type="submit"]').click();
+      });
+      cy.get('[data-testid="modal:issue-create"]').should('not.exist');
+      cy.contains('Issue has been successfully created.').should('be.visible');
+      cy.reload();
     cy.contains('Issue has been successfully created.').should('not.exist');
     cy.get('[data-testid="board-list:backlog').should('be.visible').and('have.length', '1').within(() => {
       cy.get('[data-testid="list-issue"]')
           .should('have.length', '5')
           .first()
           .find('p')
-          .contains('Bug');
-  });
-  });
-
+          .contains('BUG');
+          cy.get('[data-testid="avatar:Pickle Rick"]').should('be.visible');
+         // cy.get('[data-testid="icon:bug"]').should('be.visible');
+        });
+      }); 
+    });   
   
 //Test case 2: Random Data Plugin Issue Creation
-import { faker } from '@faker-js/faker';
-
-it('Add test case with random Title', () => {
-  const randomtext = faker.lorem.sentence();
-  cy.visit('/');
-
-  cy.get('[data-testid="icon:plus"]').click();
-  cy.get('[data-testid="select:type"]').contains('Task').click();
-  
-
-  
-  const randomWord = faker.lorem.word();
-
-  cy.get('.ql-editor').type(randomtext);
-  cy.get('input[name="title"]').type(randomWord);
-  cy.get('[data-testid="select:userIds"]').click();
-  cy.get('[data-testid="select-option:Baby Yoda"]').click();
-  cy.get('[data-testid="select:priority"]').click();
-  cy.get('[data-testid="select-option:Low"]').trigger('click');
-  cy.get('button[type="submit"]').click();
-  
-
-
-  //cy.get('[data-testid="icon:plus"]').should('not.exist');
+import { faker } from '@faker-js/faker'
+describe('Test case 2', () => {
+  beforeEach(() => {
+    cy.visit('/');
+    cy.url().should('eq', `${Cypress.env('baseUrl')}project/board`).then((url) => {
+    
+    cy.visit(url + '/board?modal-issue-create=true');
+    });
+  });
+  it.only('Should create a random issue', () => {
+    cy.get('[data-testid="modal:issue-create"]').within(() => {
+    cy.get('[data-testid="select:type"]').contains('Task').click();
+    //cy.get('[data-testid="select-option:Task"]')
+          //.trigger('click');
+    const randomText = faker.lorem.sentence()
+    const randomWord = faker.lorem.word()
+    cy.get('.ql-editor').type(randomText);
+    cy.get('input[name="title"]').type(randomWord);
+    cy.get('[data-testid="select:reporterId"]').click();
+    cy.get('[data-testid="select-option:Baby Yoda"]').click();
+    cy.get('button[type="submit"]').click();
+  });
+  cy.get('[data-testid="modal:issue-create"]').should('not.exist');
   cy.contains('Issue has been successfully created.').should('be.visible');
-
   cy.reload();
-  cy.contains('Issue has been successfully created.').should('not.exist');
-  cy.get('[data-testid="board-list:backlog').should('be.visible').and('have.length', '1').within(() => {
-    cy.get('[data-testid="icon:plus"]')
-        .should('have.length', '6')
-        .first()
-        .find('p')
-        .contains(randomtext);
-});
-});
-
-
+cy.contains('Issue has been successfully created.').should('not.exist');
+cy.get('[data-testid="board-list:backlog').should('be.visible').and('have.length', '1').within(() => {
+  cy.get('[data-testid="list-issue"]')
+      .should('have.length', '5')
+      .first()
+      .find('p')
+      .contains(randomWord);
+      //cy.get('[data-testid="avatar:Pickle Rick"]').should('be.visible');
+      //cy.get('[data-testid="icon:bug"]').should('be.visible');
+    });
+  }); 
+});   
