@@ -70,33 +70,46 @@ describe('Issue create', () => {
     //Add more tests for covering issue creaton functionality
 
     // Test case 1 Custom issue creation "Bug"
-  it.only('Add test case with title Bug', () => {
-    cy.visit('/');
+  it('Add test case with title Bug', () => {
+    cy.get('[data-testid="modal:issue-create"]').within(() => {
+      cy.get('.ql-editor').type('My bug description');
+      cy.get('input[name="title"]').type('Bug');
 
-    cy.get('[data-testid="icon:plus"]').click();
-    cy.get('[data-testid="select:type"]').click();
-    cy.get('[data-testid="select-option:Bug"]').trigger('click');
-    cy.get('.ql-editor').type('My bug description');
-    cy.get('input[name="title"]').type('Bug');
-    cy.get('[data-testid="select:reporterId"]').click();
-    cy.get('[data-testid="select-option:Pickle Rick"]').click();
-    cy.get('[data-testid="select:priority"]').click();
-    cy.get('[data-testid="select-option:Highest"]').trigger('click');
-    cy.get('button[type="submit"]').click();
+      cy.get('[data-testid="select:reporterId"]').click();
+      cy.get('[data-testid="select-option:Pickle Rick"]').click();
+
     
-  
+    cy.get('[data-testid="select:type"]').click();
+    cy.get('[data-testid="select-option:Bug"]').click();
+    
+       
+    cy.get('[data-testid="select:priority"]').click();
+    cy.get('[data-testid="select-option:Highest"]').click();
+    cy.get('button[type="submit"]').click();
 
-    cy.get('[data-testid="icon:plus"]').should('not.exist');
-    cy.contains('Issue has been successfully created.').should('be.visible');
+    //assest
+    cy.get('input[name="title"]').should('have.value', 'Bug');
+    cy.get('.ql-editor').should('have.text', 'My bug description');
+    cy.get('[data-testid="select:type"]').should('have.text', 'Bug');
+    cy.get('[data-testid="select:reporterId"]').should('have.text', 'Pickle Rick');
+    cy.get('[data-testid="select:priority"]').should('have.text', 'Highest');
+    cy.get('button[type="submit"]').click();
+    });
 
+    //Assert that modal window is closed and successful message is visible
+    cy.get('[data-testid="modal:issue-create"]').should('not.exist');
+     cy.contains('Issue has been successfully created.').should('be.visible');
     cy.reload();
     cy.contains('Issue has been successfully created.').should('not.exist');
+    //Assert than only one list with name Backlog is visible and do steps inside of it
     cy.get('[data-testid="board-list:backlog').should('be.visible').and('have.length', '1').within(() => {
-      cy.get('[data-testid="list-issue"]')
-          .should('have.length', '5')
-          .first()
-          .find('p')
-          .contains('Bug');
+     //Assert that this list contains 5 issues and first element with tag p has specified text
+    cy.get('[data-testid="list-issue"]')
+    .should('have.length', '5').first()
+    .find('p').contains('Bug');
+    //Assert that correct type icon is visible
+    cy.get('[data-testid="icon:bug"]').should('be.visible');
+  
   });
   });
 
@@ -104,39 +117,51 @@ describe('Issue create', () => {
 //Test case 2: Random Data Plugin Issue Creation
 import { faker } from '@faker-js/faker';
 
-it('Add test case with random Title', () => {
-  const randomtext = faker.lorem.sentence();
-  cy.visit('/');
-
-  cy.get('[data-testid="icon:plus"]').click();
-  cy.get('[data-testid="select:type"]').contains('Task').click();
-  
-
-  
-  const randomWord = faker.lorem.word();
-
-  cy.get('.ql-editor').type(randomtext);
-  cy.get('input[name="title"]').type(randomWord);
-  cy.get('[data-testid="select:userIds"]').click();
+it('Should create another task and validate it successfully', () => {
+  let title = faker.lorem.word();
+  let description = faker.lorem.sentence();
+  cy.get('[data-testid="modal:issue-create"]').within(() => {
+  cy.get('.ql-editor').type(description);
+  cy.get('input[name="title"]').type(title);
+  cy.get('[data-testid="select:reporterId"]').click();
   cy.get('[data-testid="select-option:Baby Yoda"]').click();
   cy.get('[data-testid="select:priority"]').click();
-  cy.get('[data-testid="select-option:Low"]').trigger('click');
+  cy.get('[data-testid="select-option:Low"]').click();
+  //assert all values are correctly visible
+  cy.get('input[name="title"]').should('have.value', title);
+  cy.get('.ql-editor').should('have.text', description);
+  cy.get('[data-testid="select:type"]').should('have.text', 'Task');
+  cy.get('[data-testid="select:reporterId"]').should('have.text', 'Baby Yoda');
+  cy.get('[data-testid="select:priority"]').should('have.text', 'Low');
   cy.get('button[type="submit"]').click();
-  
-
-
-  //cy.get('[data-testid="icon:plus"]').should('not.exist');
+  });
+  //Assert that modal window is closed and successful message is visible
+  cy.get('[data-testid="modal:issue-create"]').should('not.exist');
   cy.contains('Issue has been successfully created.').should('be.visible');
-
   cy.reload();
   cy.contains('Issue has been successfully created.').should('not.exist');
+  //Assert than only one list with name Backlog is visible and do steps inside of it
   cy.get('[data-testid="board-list:backlog').should('be.visible').and('have.length', '1').within(() => {
-    cy.get('[data-testid="icon:plus"]')
-        .should('have.length', '6')
-        .first()
-        .find('p')
-        .contains(randomtext);
+  //Assert that this list contains 5 issues and first element with tag p has specified text
+  cy.get('[data-testid="list-issue"]')
+  .should('have.length', '5').first()
+  .find('p').contains(title);
+  //Assert that correct avatar and type icon are visible
+  cy.get('[data-testid="icon:task"]').should('be.visible');
+  });
+
+  //Assert that modal window is closed and successful message is visible
+cy.get('[data-testid="modal:issue-create"]').should('not.exist');
+cy.contains('Issue has been successfully created.').should('be.visible');
+cy.reload();
+cy.contains('Issue has been successfully created.').should('not.exist');
+//Assert than only one list with name Backlog is visible and do steps inside of it
+cy.get('[data-testid="board-list:backlog').should('be.visible').and('have.length', '1').within(() => {
+//Assert that this list contains 5 issues and first element with tag p has specified text
+cy.get('[data-testid="list-issue"]')
+.should('have.length', '5').first()
+.find('p').contains(title);
+//Assert that correct avatar and type icon are visible
+cy.get('[data-testid="icon:task"]').should('be.visible');
 });
 });
-
-
