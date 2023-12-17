@@ -7,7 +7,7 @@ describe('Issue deletion', () => {
     });
   });
 
-  it.only('Test case 1: Issue deletion', () => {
+  it.only('Test case 2: Issue deletion', () => {
     cy.visit('/');
     cy.get('[data-testid="icon:plus"]').trigger('click');
     cy.get('[data-testid="select:type"]').click();
@@ -32,7 +32,7 @@ describe('Issue deletion', () => {
   });
 });
 
-it('Test case 2: Issue deletion cancellation', () => {
+it('Test case 3: Issue deletion cancellation by opening issue from the board', () => {
   cy.visit('/');
   cy.contains('Click on an issue to see').click();
   cy.get('[data-testid="modal:issue-details"]').should('be.visible');
